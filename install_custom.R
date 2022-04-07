@@ -31,6 +31,7 @@ install_github("ebecht/MCPcounter", ref = "master", subdir = "Source",
 
 # packages must be installed in this order
 
+## packages to install Hmisc
 # acepack requires installation of gfortran, installed in environment.yml
 ace_url <- "https://cran.r-project.org/src/contrib/Archive/acepack/acepack_1.3-3.3.tar.gz"
 install.packages(ace_url, repos=NULL, type="source")
@@ -41,9 +42,29 @@ install.packages(latt_url, repos=NULL, type="source")
 for_url <- "https://cran.r-project.org/src/contrib/Archive/foreign/foreign_0.8-66.tar.gz"
 install.packages(for_url, repos=NULL, type="source")
 
-hmsic_url <- "https://cran.r-project.org/src/contrib/Archive/Hmisc/Hmisc_4.0-0.tar.gz"
+tmp_url <- "https://cran.r-project.org/src/contrib/Archive/Formula/Formula_1.2-1.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
+tmp_url <-"https://cran.r-project.org/src/contrib/Archive/rpart/rpart_4.1-10.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
+tmp_url <-"https://cran.r-project.org/src/contrib/Archive/nnet/nnet_7.3-11.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
+hmsic_url <- "https://cran.r-project.org/src/contrib/Archive/Hmisc/Hmisc_3.17-2.tar.gz"
 install.packages(hmsic_url, repos=NULL, type="source")
 
+
+
+## remaining packages to install WGCNA
+tmp_url <-"https://cran.r-project.org/src/contrib/Archive/dynamicTreeCut/dynamicTreeCut_1.62.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
+tmp_url <-"https://cran.r-project.org/src/contrib/Archive/fastcluster/fastcluster_1.1.16.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
+tmp_url <-"https://cran.r-project.org/src/contrib/Archive/matrixStats/matrixStats_0.50.1.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
 
 packageurl <- "https://cran.r-project.org/src/contrib/Archive/WGCNA/WGCNA_1.51.tar.gz"
 install.packages(packageurl, repos=NULL, type="source")
