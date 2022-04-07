@@ -6,6 +6,20 @@
 #
 #          R --no-save < install_custom.R
 
+tmp_url <- "https://cran.r-project.org/src/contrib/Archive/whisker/whisker_0.3-2.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
+tmp_url <- "https://cran.r-project.org/src/contrib/Archive/rstudioapi/rstudioapi_0.6.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
+tmp_url <- "https://cran.r-project.org/src/contrib/Archive/git2r/git2r_0.17.0.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
+
+
+tmp_url <- "https://cran.r-project.org/src/contrib/Archive/devtools/devtools_1.13.3.tar.gz"
+install.packages(tmp_url, repos=NULL, type="source")
+
 library(devtools)
 
 # Install ESTIMATE
@@ -13,8 +27,8 @@ rforge <- "http://r-forge.r-project.org"
 install.packages("estimate", repos = rforge, dependencies = TRUE)
 
 # Install MCPcounter
-install_github("ebecht/MCPcounter", ref = "master", subdir = "Source",
-               force = TRUE)
+options(unzip = "internal")
+devtools::install_github("ebecht/MCPcounter", ref = "master", subdir = "Source", force = TRUE)
 
 # Install WGCNA version 1.51
 

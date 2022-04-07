@@ -29,7 +29,8 @@ RUN apt-get install -y --no-install-recommends \
 		libgsl0-dev
 
 RUN apt-get install -y --no-install-recommends \
-		gfortran
+		gfortran \
+		zlib1g-dev
 
 
 # install R dependencies
