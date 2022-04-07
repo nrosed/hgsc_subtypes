@@ -28,6 +28,10 @@ RUN apt-get install -y --no-install-recommends \
 		build-essential \
 		libgsl0-dev
 
+RUN apt-get install -y --no-install-recommends \
+		gfortran
+
+
 # install R dependencies
 COPY ./environment.yml /tmp/environment.yml
 COPY ./install_custom.R /tmp/install_custom.R
@@ -41,10 +45,12 @@ RUN wget -nv http://download.joachims.org/svm_perf/current/svm_perf.tar.gz \
 RUN cd svmperf && tar -xf svm_perf.tar.gz && make
 
 #RUN hg clone https://bitbucket.org/libsleipnir/sleipnir
-RUN git clone https://github.com/FunctionLab/sleipnir.git
+#RUN git clone https://github.com/FunctionLab/sleipnir.git
 
-RUN cd sleipnir && ./gen_auto && ./gen_tools_am
-RUN cd sleipnir && ./configure --with-svm-perf=~/svmperf/ && make && make install
+#RUN cd sleipnir && git submodule init && git submodule update
+#RUN cd sleipnir && ./gen_auto && ./gen_tools_am
+#RUN cd sleipnir && ./configure --with-svm-perf=~/svmperf/ && make && make install
+
 
 # Install curatedOvarianData_1.8.0 from cached download
 # RUN wget -nv https://bitbucket.org/gwaygenomics/download/raw/\

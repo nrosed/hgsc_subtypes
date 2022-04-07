@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euxo pipefail
 
 exec &>hgsc_analysis.out 
 
@@ -24,12 +25,9 @@ exec &>hgsc_analysis.out
 # Download Mayo data
 #################
 # COMBAT adjust Mayo data
-Rscript 1.DataInclusion/Scripts/processMayoEset/\
-Agilent1and2and3_COMBAT_datamerge.R
+Rscript 1.DataInclusion/Scripts/processMayoEset/Agilent1and2and3_COMBAT_datamerge.R
 
 # Create an eset from the Mayo data
-# NOTE: This requires the Normalizer function from the Sleipnir library 
-# (http://libsleipnir.bitbucket.org/)
 Rscript 1.DataInclusion/Scripts/processMayoEset/createMayoEset.R
 
 # Define Constants
@@ -62,8 +60,7 @@ Rscript 1.DataInclusion/Scripts/A.getInclusion.R  # (Table 1)
 # This script will also output Venn diagrams for visualizing overlapping genes 
 # (Sup. Fig. S1) #NOTE: Bonome (GSE12672) is removed following the across 
 # dataset correlations analysis. Add it here.
-R --no-save --args $DATASETS "GSE26712_eset" < 1.DataInclusion/Scripts/\
-B.getGenes.R
+R --no-save --args $DATASETS "GSE26712_eset" < 1.DataInclusion/Scripts/B.getGenes.R
 
 #################
 # PART TWO: 
