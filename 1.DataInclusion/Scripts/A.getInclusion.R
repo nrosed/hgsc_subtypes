@@ -1,5 +1,6 @@
 ############################################
-# Amy Campbell
+# Natalie Davidson updated to include new RNA-Seq data
+# Amy Campbell updated
 # Updated from Greg Way/ James Rudd pipeline
 # Cross-population analysis of high-grade serous ovarian cancer
 # does not support four subtypes
@@ -45,11 +46,20 @@ excludeEsets <- c("PMID17290060_eset", "E.MTAB.386_eset")
 options <- list(optparse::make_option(c("--aaces"),
                                       default = "aaces_expression.tsv",
                                       help = "path to AACES dataset",
+                                      type = "character"),
+                optparse::make_option(c("--aaces_rna"),
+                                      default = "salmon_normalized_filtered_for_way_pipeline.tsv",
+                                      help = "path to AACES RNASeq dataset",
                                       type = "character"))
 opt_parser <- optparse::OptionParser(option_list = options)
 opt <- optparse::parse_args(opt_parser)
 
 aacespath <- opt$aaces
+aacesRNApath <- opt$aaces_rna
+
+print(aacespath)
+print(aacesRNApath)
+
 
 ####################################
 # Load Data
@@ -64,11 +74,39 @@ load("1.DataInclusion/Data/Mayo/MayoEset.Rda")
 # Load the AACES expression data
 if (file.exists(aacespath)) {
   aaces.exprs <- read.table(aacespath, sep = "\t", row.names = 1, header = TRUE)
-  aaces.eset <- ExpressionSet(assayData = as.matrix(aaces.exprs))
+
+  pData <- data.frame(id=colnames(aaces.exprs), row.names=colnames(aaces.exprs))
+  phenoData <- AnnotatedDataFrame(data=pData)
+
+  aaces.eset <- ExpressionSet(assayData = as.matrix(aaces.exprs),
+                  phenoData=phenoData)
+
+  outfile = paste0(dirname(aacespath), "/", "aaces.eset.RData")
+  save(aaces.eset, file=outfile)
+
   aaces <- TRUE
 } else {
   aaces <- FALSE
   warning("Warning: AACES dataset not found; proceeding with the remaining datasets.")
+}
+
+if (file.exists(aacesRNApath)) {
+  aaces.rnaseq.eset <- read.table(aacesRNApath, sep = "\t", row.names = 1, header = TRUE)
+  aaces.rnaseq.eset = log10(aaces.rnaseq.eset + 1)
+
+  pData <- data.frame(id=colnames(aaces.rnaseq.eset), row.names=colnames(aaces.rnaseq.eset))
+  phenoData <- AnnotatedDataFrame(data=pData)
+
+  aaces.rnaseq.eset <- ExpressionSet(assayData = as.matrix(aaces.rnaseq.eset),
+                  phenoData=phenoData)
+
+  outfile = paste0(dirname(aacesRNApath), "/", "aaces.rnaseq.eset.RData")
+  save(aaces.rnaseq.eset, file=outfile)
+
+  aaces_rna <- TRUE
+} else {
+  aaces_rna <- FALSE
+  warning("Warning: AACES RNASeq dataset not found; proceeding with the remaining datasets.")
 }
 
 ##################################
@@ -96,7 +134,14 @@ if (aaces) {
   colnames(inclusionTable[[1]])[(ncol(inclusionTable[[1]]))] <- "aaces.eset"
   
 }
-
+if (aaces_rna) {
+  inclusionTable.aaces.rnaseq <- simpleExclusion(aaces.rnaseq.eset)
+  inclusionTable.aaces.rnaseq[[2]] <- sampleNames(aaces.rnaseq.eset)
+  inclusionTable[[1]] <- cbind(inclusionTable[[1]],
+                               inclusionTable.aaces.rnaseq[[1]])
+  colnames(inclusionTable[[1]])[(ncol(inclusionTable[[1]]))] <- "aaces.rnaseq.eset"
+  
+}
 # Save a copy of the first list element, a data.frame which details
 # the creation of the analytic set and how many samples were excluded and why
 
@@ -127,6 +172,7 @@ for (i in 1:(length(goodSamples))) {
     rm(exprs)
 
     # Limit it to only the good samples
+    # also subsample for speed
     exprsString <- paste(names(goodSamples)[i], " <- ",
                          names(goodSamples)[i], "[,goodSamples[[i]]]", sep = "")
 
@@ -154,6 +200,7 @@ goodSamples.chosen[[length(esetList.chosen)]] <-
 names(esetList.chosen)[(length(esetList.chosen))] <- 
   names(goodSamples.chosen)[(length(esetList.chosen))] <- "mayo.eset"
 
+num_skip_dopple = 1
 if (aaces) {
   esetList.chosen[[length(esetList.chosen) + 1]] <-
     aaces.eset[, inclusionTable.aaces[[2]]]
@@ -161,17 +208,35 @@ if (aaces) {
     inclusionTable.aaces[[2]]
   names(esetList.chosen)[length(esetList.chosen)] <-
     names(goodSamples.chosen)[length(esetList.chosen)] <- "aaces.eset"
+  num_skip_dopple = num_skip_dopple + 1
+} 
+if (aaces_rna) {
+  esetList.chosen[[length(esetList.chosen) + 1]] <-
+    aaces.rnaseq.eset[, inclusionTable.aaces.rnaseq[[2]]]
+  goodSamples.chosen[[length(esetList.chosen)]] <-
+    inclusionTable.aaces.rnaseq[[2]]
+  names(esetList.chosen)[length(esetList.chosen)] <-
+    names(goodSamples.chosen)[length(esetList.chosen)] <- "aaces.rnaseq.eset"
+  num_skip_dopple = num_skip_dopple + 1
 } 
 
+
 testesets <- esetList.chosen
-testesets[1:(length(esetList.chosen) - 2)] <-
-  lapply(testesets[1:(length(testesets) - 2)], function(X) rename.esets(X))
+testesets[1:(length(esetList.chosen) - num_skip_dopple)] <-
+  lapply(testesets[1:(length(testesets) - num_skip_dopple)], function(X) rename.esets(X))
+
+default <- registered()
+register(MulticoreParam(timeout = 30L * 24L * 60L * 60L * 100L), default = TRUE)
 
 doppel.result <-
-  doppelgangR::doppelgangR(testesets, corFinder.args = list(use.ComBat = TRUE),
-                           cache.dir = NULL)
+  doppelgangR::doppelgangR(testesets, intermediate.pruning = TRUE,
+                           corFinder.args = list(use.ComBat = TRUE),
+                           cache.dir = "cache")
 
 
+#doppel.result_second <-
+#  doppelgangR::doppelgangR(testesets[6:8], corFinder.args = list(use.ComBat = TRUE),
+#                           cache.dir = "cache")
 # Process the doppelgangR results into data.frames and write to the harddrive
 doppelResult.full <- summary(doppel.result)
 doppelResult.full_out <-

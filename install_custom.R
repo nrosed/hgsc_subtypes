@@ -30,6 +30,10 @@ install.packages("estimate", repos = rforge, dependencies = TRUE)
 options(unzip = "internal")
 devtools::install_github("ebecht/MCPcounter", ref = "master", subdir = "Source", force = TRUE)
 
+# Install FSQN
+options(unzip = "internal")
+devtools::install_github("jenniferfranks/FSQN", ref = "master", subdir = "Source", force = TRUE)
+
 # Install WGCNA version 1.51
 
 # for some reason this version is no longer able
@@ -82,3 +86,14 @@ install.packages(tmp_url, repos=NULL, type="source")
 
 packageurl <- "https://cran.r-project.org/src/contrib/Archive/WGCNA/WGCNA_1.51.tar.gz"
 install.packages(packageurl, repos=NULL, type="source")
+
+## install sfsmisc
+packageurl <- "https://cran.r-project.org/src/contrib/Archive/sfsmisc/sfsmisc_1.1-0.tar.gz"
+install.packages(packageurl, repos=NULL, type="source")
+
+## install estimate 
+install.packages("http://download.r-forge.r-project.org/src/contrib/estimate_1.0.13.tar.gz")
+
+# install GSVA version 1.22.4 for Bioconductor version 3.4   1.24.1
+#install.packages("https://bioconductor.org/packages/3.5/bioc/src/contrib/GSVA_1.24.2.tar.gz")
+#biocLite("GSVA")

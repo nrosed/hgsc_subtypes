@@ -28,7 +28,7 @@ echo "RUNNING: Create an eset from the Mayo data"
 echo "FINISHED: Create an eset from the Mayo data"
 
 # Define Constants
-DATASETS="TCGA_eset mayo.eset GSE32062.GPL6480_eset GSE9891_eset aaces.eset"
+DATASETS="TCGA_eset mayo.eset GSE32062.GPL6480_eset GSE9891_eset aaces.eset aaces.rnaseq.eset"
 KMIN=2
 KMAX=4
 SEED=123
@@ -37,6 +37,7 @@ NO_SHUFFLE=FALSE
 SHUFFLE=TRUE
 SAM_SUBSET='commongenes'
 AACES_PATH='1.DataInclusion/Data/AACES/aaces_expression.tsv'
+AACES_RNASEQ_PATH='1.DataInclusion/Data/AACES/salmon_normalized_filtered_for_way_pipeline.tsv'
 
 #################
 # PART ONE: 
@@ -52,14 +53,14 @@ AACES_PATH='1.DataInclusion/Data/AACES/aaces_expression.tsv'
 
 # Output the samples for each dataset that pass the inclusion criteria
 echo "RUNNING: Dataset Selection and Inclusion step 1"
-#Rscript 1.DataInclusion/Scripts/A.getInclusion.R --aaces $AACES_PATH
+Rscript 1.DataInclusion/Scripts/A.getInclusion.R --aaces $AACES_PATH --aaces_rna $AACES_RNASEQ_PATH
 echo "FINISHED: Dataset Selection and Inclusion step 1"
 
 # Output the common genes and the MAD (Median Absolute Deviation) genes to be
 # used in developing moderated t score vectors and in clustering, respectively.
 echo "RUNNING: Dataset Selection and Inclusion step 2"
-#Rscript 1.DataInclusion/Scripts/B.getGenes.R $DATASETS "GSE26712_eset"
-echo "RUNNING: Dataset Selection and Inclusion step 2"
+Rscript 1.DataInclusion/Scripts/B.getGenes.R $DATASETS "GSE26712_eset"
+echo "FINISHED: Dataset Selection and Inclusion step 2"
 
 #################
 # PART TWO:
@@ -79,8 +80,8 @@ echo "RUNNING: Dataset Selection and Inclusion step 2"
 # Output across dataset correlations for MAD genes
 # NOTE: common genes used in downstream analyses
 echo "RUNNING: SAM with MAD genes"
-#Rscript 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R $KMIN $KMAX $NSTARTS $SEED FALSE $NO_SHUFFLE \
-#"madgenes" $DATASETS "GSE26712_eset" 
+Rscript 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R $KMIN $KMAX $NSTARTS $SEED FALSE $NO_SHUFFLE \
+"madgenes" $DATASETS "GSE26712_eset" 
 echo "FINISHED: SAM with MAD genes"
 
 # ~~~~~~~~~~~~~
@@ -88,19 +89,19 @@ echo "FINISHED: SAM with MAD genes"
 # ~~~~~~~~~~~~~
 # Perform k means and SAM
 echo "RUNNING: k means & SAM step 1"
-#Rscript 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R $KMIN $KMAX $NSTARTS $SEED FALSE $NO_SHUFFLE $SAM_SUBSET \
-#$DATASETS "GSE26712_eset" 
+Rscript 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R $KMIN $KMAX $NSTARTS $SEED FALSE $NO_SHUFFLE $SAM_SUBSET \
+$DATASETS "GSE26712_eset" 
 echo "FINISHED: k means & SAM step 1"
 
 # Output correlation matrices
 echo "RUNNING: k means & SAM step 2"
-#Rscript 2.Clustering_DiffExprs/Scripts/B.CorrelationMatrix.R $KMIN $KMAX $SEED Figures/CorrelationMatrix/ $DATASETS \
-#"GSE26712_eset"
+Rscript 2.Clustering_DiffExprs/Scripts/B.CorrelationMatrix.R $KMIN $KMAX $SEED Figures/CorrelationMatrix/ $DATASETS \
+"GSE26712_eset"
 echo "FINISHED: k means & SAM step 2"
 
 # Output k-means barcharts
 echo "RUNNING: k means & SAM step 3"
-#Rscript 2.Clustering_DiffExprs/Scripts/C.KMeansBarCharts.R $KMIN $KMAX $DATASETS 
+Rscript 2.Clustering_DiffExprs/Scripts/C.KMeansBarCharts.R $KMIN $KMAX $DATASETS 
 echo "FINISHED: k means & SAM step 3"
 
 # Shuffle genes to compare across population correlations in real data

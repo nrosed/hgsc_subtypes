@@ -240,6 +240,7 @@ AssignReference <- function (Reference, Cluster, Cor, ClusterList) {
   }
   
   # Observe the top correlating clusters
+  newCorframe <- newCorframe[grep(Cluster, newCorframe[, 2]), ]
   unique_clusters <- as.character(unique(newCorframe$Var1))
   
   # Find top correlating cluster for each unique cluster
@@ -278,12 +279,12 @@ AssignReference <- function (Reference, Cluster, Cor, ClusterList) {
   ref <- ClusterList[[grep(Reference, names(ClusterList))]]
   
   # Focus on K = 3 vs. K = 4 first
-  for (map in 1:length(unique(Comparisons[[1]][, 4]))) {
+  for (map in 1:length(unique(Comparisons[["ClusterK4"]][, 4]))) {
     # Temporarily replace original cluster assignments
-    ref[, 2][ref[, 2] == as.integer(Comparisons[[1]][map, 4])] <- paste0(map,
-                                                                         "tmp")
-    ref[, 3][ref[, 3] == as.integer(Comparisons[[1]][map, 2])] <- paste0(map,
-                                                                         "tmp")
+    ref[, 2][ref[, 2] == as.integer(Comparisons[["ClusterK4"]][map, 4])] <- paste0(map,
+                                                                        "tmp")
+    ref[, 3][ref[, 3] == as.integer(Comparisons[["ClusterK4"]][map, 2])] <- paste0(map,
+                                                                        "tmp")
   }
   
   # If there is no "tmp" found in the column, make it cluster 4

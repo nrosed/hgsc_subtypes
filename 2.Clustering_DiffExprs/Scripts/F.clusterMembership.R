@@ -10,7 +10,7 @@ args <- commandArgs(trailingOnly=TRUE)
 # args <- c("TCGA_eset", "mayo.eset", "GSE32062.GPL6480_eset", "GSE9891_eset", "GSE26712_eset", "aaces.eset")
 
 # Get dataset name of the esets that we're loading
-datasets <- c("TCGA", "mayo.eset", "Yoshihara", "Tothill", "Bonome", "aaces.eset")
+datasets <- c("TCGA", "mayo.eset", "Yoshihara", "Tothill", "Bonome", "aaces.eset", "aaces.rnaseq.eset")
 
 # List all kmeans files
 allkmeansFiles <- list.files("2.Clustering_DiffExprs/Tables/ClusterMembership/kmeans/")

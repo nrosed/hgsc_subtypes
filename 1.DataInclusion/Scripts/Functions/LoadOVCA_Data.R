@@ -23,7 +23,8 @@ LoadOVCA_Data <- function(datasets,
                           madgenes_dir = "1.DataInclusion/Data/Genes/GlobalMAD_genelist.csv",
                           genelist_subset = "commongenes",
                           mayo_exprs_file = "1.DataInclusion/Data/Mayo/MayoEset.Rda",
-                          aaces_exprs_file = "1.DataInclusion/Data/Aaces/aaces.eset.RData",
+                          aaces_exprs_file = "1.DataInclusion/Data/AACES/aaces.eset.RData",
+                          aaces_rnaseq_exprs_file = "1.DataInclusion/Data/AACES/aaces.rnaseq.eset.RData",
                           aaces_path = "aaces_expression.tsv",
                           shuffle = FALSE,
                           zscore = FALSE) {
@@ -82,16 +83,20 @@ LoadOVCA_Data <- function(datasets,
       }
       
       # Mayo data is not in curatedOvarianData
-    } else if (grepl("mayo.eset", eset_exprs)) {
+    } else if (any(grepl("mayo.eset", eset_exprs))) {
       cat("Loading", eset_exprs, "...\n")
       mayo.eset <- get(load(mayo_exprs_file))
       dta <- exprs(mayo.eset)
       # neither is AACES
-    } else if (grepl("aaces", eset_exprs)) {
+    } else if (any(grepl("aaces.eset", eset_exprs))) {
       cat("Loading", eset_exprs, "...\n")
       aaces.eset <- get(load(aaces_exprs_file))
       dta <- exprs(aaces.eset)
-    } else {
+    } else if (any(grepl("aaces.rnaseq.eset", eset_exprs))) {
+      cat("Loading", eset_exprs, "...\n")
+      aaces.rnaseq.eset <- get(load(aaces_rnaseq_exprs_file))
+      dta <- exprs(aaces.rnaseq.eset)
+    }  else {
       stop("Dataset does not exist in curatedOvarianData")
     }
 

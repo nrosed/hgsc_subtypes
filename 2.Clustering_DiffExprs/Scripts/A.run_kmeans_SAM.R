@@ -11,9 +11,11 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# args <- c(2, 4, 20, 123, TRUE, FALSE, "commongenes", "TCGA_eset", "mayo.eset",
+#args <- c(2, 4, 20, 123, FALSE, FALSE, "commongenes", "aaces.rnaseq.eset", "TCGA_eset", "mayo.eset",
 #          "GSE32062.GPL6480_eset", "GSE9891_eset", "GSE26712_eset",
 #           "aaces.eset")
+#args <- c(2, 4, 20, 123, FALSE, TRUE, "commongenes", "aaces.rnaseq.eset", "aaces.eset", "TCGA_eset", "GSE26712_eset")
+
 ############################################
 # Load Libraries
 ############################################
@@ -232,9 +234,10 @@ if (bNMF) {
                                  Cor = WithinDatasetCor,
                                  ClusterList = Clusters)
 }
-  
+
 # Run SAM again but with TCGA clusters assigned as a reference
 ReferenceSamList <- RunSam(ExpData, NewClusters, d.stat)
+
 
 # NewDlist will house dataframes of SAM moderated t score vectors
 # for each dataset passed as an argument after remapping to reference clusters.
@@ -608,3 +611,8 @@ datasets <- argsCurated[-grep("GSE26712_eset", argsCurated)]
 ############################################
 plot_reassigned_heatmaps(shuffle, bNMF, Dlist.mapped.cor, SAM_subset)
 
+dev.off()
+dev.off()
+dev.off()
+dev.off()
+dev.off()

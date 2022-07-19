@@ -116,54 +116,64 @@ for (dataset in 1:length(ExpData)) {
   # Loop over the range of k
   for (centroid in 1:length(krange)) {
     
-    # Reorder the gene expression dataset
-    dataclustertmp <- CorMatrixOrder(ExpData[[dataset]], ClusterAssign, as.numeric(paste(centroid)))   
-    
-    # Store side color information depending on cluster num
-    colorPool <- c('skyblue1', 'tomato')
-    if (centroid == 2) {
-      colorPool <- c(colorPool, "springgreen")
-    } else if (centroid == 3) {
-      colorPool <- c(colorPool, "springgreen", "violet")
-    }
-    
-    # The side colors are different in Bonome since the clusters are not similar
-    if (name == "GSE26712_eset" & centroid == 1) {
-      colorPool <- c("gray75", "gray60")
-    } else if (name == "GSE26712_eset" & centroid == 2) {
-      colorPool <- c("gray75", "gray60", "gray45")
-    } else if (name == "GSE26712_eset" & centroid == 3) {
-      colorPool <- c("gray75", "gray60", "gray45", "gray30")
-    }
-    
-    # Prepare side colors from the color pool
-    sideColors <- as.matrix(rep(colorPool, as.vector(table(ClusterAssign[ ,centroid]))))
-    
-    # Store plot names
-    heatFile <- paste(name, krange[centroid], sep = "_")
-    heatTitle <- c("Correlation Matrix\n", paste(unlist(strsplit(name, "_"))[1], "k =", 
-                                                 krange[centroid], sep = " "))
-    
-    # Store the color range for the correlation colors
-    color_range <- colorRampPalette(c("blue", "White", "red"))(n = 2999)
-    
-    # Store color breaks
-    mid_cut = mean(dataclustertmp) - (3 * sd(dataclustertmp))
-    mid_cut_high = quantile(dataclustertmp, probs = .65)
-    col_breaks = c(seq(min(dataclustertmp), mid_cut, length = 100), seq(mid_cut,mid_cut_high, length = 1600), 
-                   seq(mid_cut_high, 1, length = 1300))
+      # Reorder the gene expression dataset
+      dataclustertmp <- CorMatrixOrder(ExpData[[dataset]], ClusterAssign, as.numeric(paste(centroid)))   
+      
+      # Store side color information depending on cluster num
+      colorPool <- c('skyblue1', 'tomato')
+      if (centroid == 2) {
+        colorPool <- c(colorPool, "springgreen")
+      } else if (centroid == 3) {
+        colorPool <- c(colorPool, "springgreen", "violet")
+      }
+      
+      # The side colors are different in Bonome since the clusters are not similar
+      if (name == "GSE26712_eset" & centroid == 1) {
+        colorPool <- c("gray75", "gray60")
+      } else if (name == "GSE26712_eset" & centroid == 2) {
+        colorPool <- c("gray75", "gray60", "gray45")
+      } else if (name == "GSE26712_eset" & centroid == 3) {
+        colorPool <- c("gray75", "gray60", "gray45", "gray30")
+      }
+      
+      # Prepare side colors from the color pool
+      sideColors <- as.matrix(rep(colorPool, as.vector(table(ClusterAssign[ ,centroid]))))
+      sideColors = data.frame(id = row.names(ClusterAssign), 
+                              color = colorPool[ClusterAssign[ ,centroid]])
+      row.names(sideColors) = sideColors$id
+      missing_ids = setdiff(colnames(ExpData[[dataset]]), row.names(sideColors))
+      if(length(missing_ids) > 0){
+        sideColors = rbind(data.frame(id=missing_ids, color="White"), sideColors)
+      }
+      row.names(sideColors) = sideColors$id
+      
+      # Store plot names
+      heatFile <- paste(name, krange[centroid], sep = "_")
+      heatTitle <- c("Correlation Matrix\n", paste(unlist(strsplit(name, "_"))[1], "k =", 
+                                                    krange[centroid], sep = " "))
+      
+      # Store the color range for the correlation colors
+      color_range <- colorRampPalette(c("blue", "White", "red"))(n = 2999)
+      
+      # Store color breaks
+      mid_cut = mean(dataclustertmp) - (3 * sd(dataclustertmp))
+      mid_cut_high = quantile(dataclustertmp, probs = .65)
+      col_breaks = c(seq(min(dataclustertmp), mid_cut, length = 100), seq(mid_cut,mid_cut_high, length = 1600), 
+                      seq(mid_cut_high, 1, length = 1300))
 
-    # Compile a heatmap for each dataset for each k
-    png(paste("2.Clustering_DiffExprs/Figures/cormatrix/", heatFile, ".png", sep = ""), 
-        width = 1000, height = 900)
-    
-    # Plot the heatmap
-    heatmap.3(dataclustertmp, symm = T, trace = 'none', Rowv = NULL, Colv = "Rowv", dendrogram = 'none', 
-              key = F, labRow = F, labCol = F, col = color_range, breaks = col_breaks, main = heatTitle, 
-              ColSideColors = sideColors, ColSideColorsSize = 2, RowSideColors = t(sideColors), 
-              RowSideColorsSize = 2)
-    
-    dev.off()
+      # Compile a heatmap for each dataset for each k
+      png(paste("2.Clustering_DiffExprs/Figures/cormatrix/", heatFile, ".png", sep = ""), 
+          width = 1000, height = 900)
+      
+      # Plot the heatmap
+      sideColors = sideColors[row.names(dataclustertmp),]
+      sideColors = as.matrix(sideColors[,2])
+      heatmap.3(dataclustertmp, symm = T, trace = 'none', Rowv = NULL, Colv = "Rowv", dendrogram = 'none', 
+                key = F, labRow = F, labCol = F, col = color_range, breaks = col_breaks, main = heatTitle, 
+                ColSideColors = sideColors, ColSideColorsSize = 2, RowSideColors = t(sideColors), 
+                RowSideColorsSize = 2)
+      
+      dev.off()
   }
 }
 
