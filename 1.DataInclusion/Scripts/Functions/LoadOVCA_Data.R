@@ -25,6 +25,7 @@ LoadOVCA_Data <- function(datasets,
                           mayo_exprs_file = "1.DataInclusion/Data/Mayo/MayoEset.Rda",
                           aaces_exprs_file = "1.DataInclusion/Data/AACES/aaces.eset.RData",
                           aaces_rnaseq_exprs_file = "1.DataInclusion/Data/AACES/aaces.rnaseq.eset.RData",
+                          aaces_white_rnaseq_exprs_file = "1.DataInclusion/Data/AACES/aaces.white.rnaseq.eset.RData",
                           aaces_path = "aaces_expression.tsv",
                           shuffle = FALSE,
                           zscore = FALSE) {
@@ -95,6 +96,10 @@ LoadOVCA_Data <- function(datasets,
     } else if (any(grepl("aaces.rnaseq.eset", eset_exprs))) {
       cat("Loading", eset_exprs, "...\n")
       aaces.rnaseq.eset <- get(load(aaces_rnaseq_exprs_file))
+      dta <- exprs(aaces.rnaseq.eset)
+    } else if (any(grepl("aaces.white.rnaseq.eset", eset_exprs))) {
+      cat("Loading", eset_exprs, "...\n")
+      aaces.rnaseq.eset <- get(load(aaces_white_rnaseq_exprs_file))
       dta <- exprs(aaces.rnaseq.eset)
     }  else {
       stop("Dataset does not exist in curatedOvarianData")

@@ -120,7 +120,7 @@ for (dataset in args) {
                          processedFile)
   outputFile <- file.path("6.Immune_Infiltrate", "Tables", "ESTIMATE", 
                           filteredFile)
-  filterCommonGenes(input.f = inputFile,
+  estimate::filterCommonGenes(input.f = inputFile,
                     output.f = outputFile,
                     id = "GeneSymbol")
 

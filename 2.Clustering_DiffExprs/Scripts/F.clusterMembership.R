@@ -7,10 +7,12 @@
 # This script will output a data frame of cluster membership for all clustering events
 
 args <- commandArgs(trailingOnly=TRUE)
-# args <- c("TCGA_eset", "mayo.eset", "GSE32062.GPL6480_eset", "GSE9891_eset", "GSE26712_eset", "aaces.eset")
+# DATASETS="aaces.rnaseq.eset aaces.white.rnaseq.eset TCGA_eset mayo.eset GSE32062.GPL6480_eset GSE9891_eset aaces.eset"
+
 
 # Get dataset name of the esets that we're loading
-datasets <- c("TCGA", "mayo.eset", "Yoshihara", "Tothill", "Bonome", "aaces.eset", "aaces.rnaseq.eset")
+datasets <- c("TCGA", "mayo.eset", "Yoshihara", "Tothill", "Bonome")
+datasets <- c("aaces.rnaseq.eset", "aaces.white.rnaseq.eset", "TCGA", "mayo.eset", "Yoshihara", "Tothill", "aaces.eset")
 
 # List all kmeans files
 allkmeansFiles <- list.files("2.Clustering_DiffExprs/Tables/ClusterMembership/kmeans/")
@@ -28,14 +30,14 @@ for (dataset in 1:length(args)) {
   kmeansFile <- allkmeansFiles[grepl(args[dataset], allkmeansFiles)]
   kmeansMemb <- read.table(paste("2.Clustering_DiffExprs/Tables/ClusterMembership/kmeans/", kmeansFile, sep = ""), 
                            row.names = 1, header = T, sep = ",")
-  colnames(kmeansMemb) <- c("ClusterK3_kmeans", "ClusterK4_kmeans")
+  colnames(kmeansMemb) <- c("ClusterK2_kmeans", "ClusterK3_kmeans", "ClusterK4_kmeans")
   			
   # Load nmf file
   nmfFile <- allnmfFiles[grepl(args[dataset], allnmfFiles)]
   nmfFile <- nmfFile[grepl("mapped", nmfFile)]
   nmfMemb <- read.table(paste("2.Clustering_DiffExprs/Tables/ClusterMembership/nmf/", nmfFile, sep = ""), 
                         row.names = 1, header = T, sep = ",")
-  colnames(nmfMemb) <- c("ClusterK3_NMF", "ClusterK4_NMF")
+  colnames(nmfMemb) <- c("ClusterK2_NMF", "ClusterK3_NMF", "ClusterK4_NMF")
   
   # get a vector of the dataset name of the same length as the number of samples
   Dataset <- rep(datasets[dataset], nrow(kmeansMemb))

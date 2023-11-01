@@ -48,7 +48,11 @@ options <- list(optparse::make_option(c("--aaces"),
                                       help = "path to AACES dataset",
                                       type = "character"),
                 optparse::make_option(c("--aaces_rna"),
-                                      default = "salmon_normalized_filtered_for_way_pipeline.tsv",
+                                      default = "salmon_normalized_filtered_for_way_pipeline_bottom10Removed.tsv",
+                                      help = "path to AACES RNASeq dataset",
+                                      type = "character"),
+                optparse::make_option(c("--aaces_rna_white"),
+                                      default = "salmon_normalized_filtered_for_way_pipeline_bottom5Removed_whites.tsv",
                                       help = "path to AACES RNASeq dataset",
                                       type = "character"))
 opt_parser <- optparse::OptionParser(option_list = options)
@@ -56,9 +60,11 @@ opt <- optparse::parse_args(opt_parser)
 
 aacespath <- opt$aaces
 aacesRNApath <- opt$aaces_rna
+aacesWhiteRNApath <- opt$aaces_rna_white
 
 print(aacespath)
 print(aacesRNApath)
+print(aacesWhiteRNApath)
 
 
 ####################################
@@ -92,7 +98,7 @@ if (file.exists(aacespath)) {
 
 if (file.exists(aacesRNApath)) {
   aaces.rnaseq.eset <- read.table(aacesRNApath, sep = "\t", row.names = 1, header = TRUE)
-  aaces.rnaseq.eset = log10(aaces.rnaseq.eset + 1)
+  aaces.rnaseq.eset = log(aaces.rnaseq.eset + 1)
 
   pData <- data.frame(id=colnames(aaces.rnaseq.eset), row.names=colnames(aaces.rnaseq.eset))
   phenoData <- AnnotatedDataFrame(data=pData)
@@ -108,7 +114,24 @@ if (file.exists(aacesRNApath)) {
   aaces_rna <- FALSE
   warning("Warning: AACES RNASeq dataset not found; proceeding with the remaining datasets.")
 }
+if (file.exists(aacesWhiteRNApath)) {
+  aaces.white.rnaseq.eset <- read.table(aacesWhiteRNApath, sep = "\t", row.names = 1, header = TRUE)
+  aaces.white.rnaseq.eset = log(aaces.white.rnaseq.eset + 1)
 
+  pData <- data.frame(id=colnames(aaces.white.rnaseq.eset), row.names=colnames(aaces.white.rnaseq.eset))
+  phenoData <- AnnotatedDataFrame(data=pData)
+
+  aaces.white.rnaseq.eset <- ExpressionSet(assayData = as.matrix(aaces.white.rnaseq.eset),
+                  phenoData=phenoData)
+
+  outfile = paste0(dirname(aacesWhiteRNApath), "/", "aaces.white.rnaseq.eset.RData")
+  save(aaces.white.rnaseq.eset, file=outfile)
+
+  aaces_white_rna <- TRUE
+} else {
+  aaces_white_rna <- FALSE
+  warning("Warning: AACES Whites RNASeq dataset not found; proceeding with the remaining datasets.")
+}
 ##################################
 # ANALYSIS
 ##################################
@@ -140,6 +163,14 @@ if (aaces_rna) {
   inclusionTable[[1]] <- cbind(inclusionTable[[1]],
                                inclusionTable.aaces.rnaseq[[1]])
   colnames(inclusionTable[[1]])[(ncol(inclusionTable[[1]]))] <- "aaces.rnaseq.eset"
+  
+}
+if (aaces_white_rna) {
+  inclusionTable.aaces.white.rnaseq <- simpleExclusion(aaces.white.rnaseq.eset)
+  inclusionTable.aaces.white.rnaseq[[2]] <- sampleNames(aaces.white.rnaseq.eset)
+  inclusionTable[[1]] <- cbind(inclusionTable[[1]],
+                               inclusionTable.aaces.white.rnaseq[[1]])
+  colnames(inclusionTable[[1]])[(ncol(inclusionTable[[1]]))] <- "aaces.white.rnaseq.eset"
   
 }
 # Save a copy of the first list element, a data.frame which details
@@ -219,7 +250,15 @@ if (aaces_rna) {
     names(goodSamples.chosen)[length(esetList.chosen)] <- "aaces.rnaseq.eset"
   num_skip_dopple = num_skip_dopple + 1
 } 
-
+if (aaces_white_rna) {
+  esetList.chosen[[length(esetList.chosen) + 1]] <-
+    aaces.white.rnaseq.eset[, inclusionTable.aaces.white.rnaseq[[2]]]
+  goodSamples.chosen[[length(esetList.chosen)]] <-
+    inclusionTable.aaces.white.rnaseq[[2]]
+  names(esetList.chosen)[length(esetList.chosen)] <-
+    names(goodSamples.chosen)[length(esetList.chosen)] <- "aaces.white.rnaseq.eset"
+  num_skip_dopple = num_skip_dopple + 1
+} 
 
 testesets <- esetList.chosen
 testesets[1:(length(esetList.chosen) - num_skip_dopple)] <-

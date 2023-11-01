@@ -25,10 +25,10 @@ exec &>hgsc_analysis.out
 # Download Mayo data
 #################
 # COMBAT adjust Mayo data
-Rscript 1.DataInclusion/Scripts/processMayoEset/Agilent1and2and3_COMBAT_datamerge.R
+#Rscript 1.DataInclusion/Scripts/processMayoEset/Agilent1and2and3_COMBAT_datamerge.R
 
 # Create an eset from the Mayo data
-Rscript 1.DataInclusion/Scripts/processMayoEset/createMayoEset.R
+#Rscript 1.DataInclusion/Scripts/processMayoEset/createMayoEset.R
 
 # Define Constants
 DATASETS="TCGA_eset mayo.eset GSE32062.GPL6480_eset GSE9891_eset aaces.eset"
@@ -54,14 +54,14 @@ AACES_PATH='1.DataInclusion/Data/AACES/aaces_expression.tsv'
 # NOTE: The Mayo Clinic Data is not currently in curatedOvarianData.
 
 # Output the samples for each dataset that pass the inclusion criteria
-Rscript 1.DataInclusion/Scripts/A.getInclusion.R --aaces $AACES_PATH  # (Table 1)
+#Rscript 1.DataInclusion/Scripts/A.getInclusion.R --aaces $AACES_PATH  # (Table 1)
 
 # Output the common genes and the MAD (Median Absolute Deviation) genes to be 
 # used in developing moderated t score vectors and in clustering, respectively. 
 # This script will also output Venn diagrams for visualizing overlapping genes 
 # (Sup. Fig. S1) #NOTE: Bonome (GSE12672) is removed following the across 
 # dataset correlations analysis. Add it here.
-R --no-save --args $DATASETS "GSE26712_eset" < 1.DataInclusion/Scripts/B.getGenes.R
+#R --no-save --args $DATASETS "GSE26712_eset" < 1.DataInclusion/Scripts/B.getGenes.R
 
 #################
 # PART TWO: 
@@ -80,56 +80,56 @@ R --no-save --args $DATASETS "GSE26712_eset" < 1.DataInclusion/Scripts/B.getGene
 # ~~~~~~~~~~~~~
 # Output across dataset correlations for MAD genes
 # NOTE: common genes used in downstream analyses
-R --no-save --args $KMIN $KMAX $NSTARTS $SEED FALSE $NO_SHUFFLE "madgenes" \
-$DATASETS "GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R
+#R --no-save --args $KMIN $KMAX $NSTARTS $SEED FALSE $NO_SHUFFLE "madgenes" \
+#$DATASETS "GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R
 
 # ~~~~~~~~~~~~~
 # k means & SAM (with common genes)
 # ~~~~~~~~~~~~~
 # Perform k means and SAM (Figure 1)
-R --no-save --args $KMIN $KMAX $NSTARTS $SEED FALSE $NO_SHUFFLE $SAM_SUBSET \
-$DATASETS "GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R
+#R --no-save --args $KMIN $KMAX $NSTARTS $SEED FALSE $NO_SHUFFLE $SAM_SUBSET \
+#$DATASETS "GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R
 
 # Output correlation matrices (Sup. Fig. S2)	
-R --no-save --args $KMIN $KMAX $SEED Figures/CorrelationMatrix/ $DATASETS \
-"GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/B.CorrelationMatrix.R
+#R --no-save --args $KMIN $KMAX $SEED Figures/CorrelationMatrix/ $DATASETS \
+#"GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/B.CorrelationMatrix.R
 
 # Output k-means barcharts (Figure S8)
-R --no-save --args $KMIN $KMAX $DATASETS < 2.Clustering_DiffExprs/Scripts/\
-C.KMeansBarCharts.R
+#R --no-save --args $KMIN $KMAX $DATASETS < 2.Clustering_DiffExprs/Scripts/\
+#C.KMeansBarCharts.R
 
 # Shuffle genes to compare across population correlations in real data  # running
-R --no-save --args $KMIN $KMAX $NSTARTS $SEED FALSE $SHUFFLE $SAM_SUBSET \
-$DATASETS "GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R
+#R --no-save --args $KMIN $KMAX $NSTARTS $SEED FALSE $SHUFFLE $SAM_SUBSET \
+#$DATASETS "GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R
 
 # ~~~~~~~~~~~~~
 # NMF
 # ~~~~~~~~~~~~~
 # Output consensus matrices, NMF cluster membership files (Sup. Figure S2) and 
 # cophenetic coefficients (Sup. Figures S3-S7)
-R --no-save --args $KMIN $KMAX $NSTARTS $SEED $DATASETS "GSE26712_eset" \
-< 2.Clustering_DiffExprs/Scripts/D.NMF.R
+#R --no-save --args $KMIN $KMAX $NSTARTS $SEED $DATASETS "GSE26712_eset" \
+#< 2.Clustering_DiffExprs/Scripts/D.NMF.R
 
 # Run SAM on NMF clusters (TRUE argument forces NMF analysis)
-R --no-save --args $KMIN $KMAX $NSTARTS $SEED TRUE $NO_SHUFFLE $SAM_SUBSET \
-$DATASETS "GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R
+#R --no-save --args $KMIN $KMAX $NSTARTS $SEED TRUE $NO_SHUFFLE $SAM_SUBSET \
+#$DATASETS "GSE26712_eset" < 2.Clustering_DiffExprs/Scripts/A.run_kmeans_SAM.R
 
 # ~~~~~~~~~~~~~
 # k means vs. NMF
 # ~~~~~~~~~~~~~
 # Compare k-means defined clusters with NMF defined clusters (Figure 2)
-R --no-save --args $DATASETS < 2.Clustering_DiffExprs/Scripts/E.kmeans_v_nmf.R
+#R --no-save --args $DATASETS < 2.Clustering_DiffExprs/Scripts/E.kmeans_v_nmf.R
 
 # Compile table with all cluster membership information (Sup. Table S2)
-R --no-save --args $DATASETS < 2.Clustering_DiffExprs/Scripts/\
-F.clusterMembership.R
+#R --no-save --args $DATASETS < 2.Clustering_DiffExprs/Scripts/\
+#F.clusterMembership.R
 
 # ~~~~~~~~~~~~~
 # Dataset Concordance
 # ~~~~~~~~~~~~~
 # Investigate the similarities in cluster membership in original TCGA 2011 
 # paper, the Konecny 2014 paper, and the Tothill 2008 paper (Table 4)
-R --no-save < 2.Clustering_DiffExprs/Scripts/G.Dataset_concordance.R
+#R --no-save < 2.Clustering_DiffExprs/Scripts/G.Dataset_concordance.R
 
 # ~~~~~~~~~~~~~
 # Tothill LMP
@@ -137,7 +137,7 @@ R --no-save < 2.Clustering_DiffExprs/Scripts/G.Dataset_concordance.R
 # Observe consensus matrices and cophenetic coefficients for Tothill dataset if 
 # LMP samples are not removed. This is similar to the results presented by TCGA 
 # supplementary figure S6.2 (Figure 3)
-R --no-save < 2.Clustering_DiffExprs/Scripts/H.TCGA_LMP_TothillPrediction.R
+#R --no-save < 2.Clustering_DiffExprs/Scripts/H.TCGA_LMP_TothillPrediction.R
 
 #################
 # PART THREE: 
@@ -150,8 +150,8 @@ R --no-save < 2.Clustering_DiffExprs/Scripts/H.TCGA_LMP_TothillPrediction.R
 # ~~~~~~~~~~~~~~~~~~~~~
 
 # Perform AIC, BIC, and silhouette width analyses
-R --no-save --args 2 8 20 $NSTARTS $SEED $DATASETS < \
-3.Fit/Scripts/A.GoodnessFit.R
+#R --no-save --args 2 8 20 $NSTARTS $SEED $DATASETS < \
+#3.Fit/Scripts/A.GoodnessFit.R
 
 # Determine gap statistic
 # NOTE: This step was performed on the Discovery Cluster at Dartmouth College
@@ -165,13 +165,14 @@ R --no-save --args 2 8 20 $NSTARTS $SEED $DATASETS < \
 # ~~~~~~~~~~~~~~~~~~~~~
 # This section will perform all survival analyses and output summary tables
 # ~~~~~~~~~~~~~~~~~~~~~
+DATASETS_SURVIVAL="TCGA_eset Mayo GSE32062.GPL6480_eset GSE9891_eset"
 
 # Output Kaplan-Meier survival curves, and perform a cox proportional hazards 
 # regression model (Sup. Fig. S11)
-R --no-save --args $DATASETS < 4.Survival/Scripts/A.Survival.R
+#R --no-save --args $DATASETS_SURVIVAL < 4.Survival/Scripts/A.Survival.R
 
 # Summarize the results of the survival analysis (Sup. Table S3)
-R --no-save --args $DATASETS < 4.Survival/Scripts/B.Summarize_Survival.R
+#R --no-save --args $DATASETS_SURVIVAL < 4.Survival/Scripts/B.Summarize_Survival.R
 
 #################
 # PART FIVE: 
@@ -182,7 +183,7 @@ R --no-save --args $DATASETS < 4.Survival/Scripts/B.Summarize_Survival.R
 # ~~~~~~~~~~~~~~~~~~~~~
 
 # Output tables of cluster specific genes based on significant SAM FDR values
-R --no-save --args $DATASETS < 5.Pathway/Scripts/A.GeneEnrichment.R
+#R --no-save --args $DATASETS < 5.Pathway/Scripts/A.GeneEnrichment.R
 
 # The output of this script is input into a PANTHER pathways analysis
 # (http://pantherdb.org/)
@@ -202,14 +203,15 @@ R --no-save --args $DATASETS < 5.Pathway/Scripts/A.GeneEnrichment.R
 # Perform ESTIMATE analysis to observe immune/stromal cell
 # infiltration and infer a tumor purity for each individual tumor
 # sample
-R --no-save --args $DATASETS < 6.Immune_Infiltrate/Scripts/A.ESTIMATE.R
+DATASETS_ESTIMATE="TCGA_eset mayo.eset GSE32062.GPL6480_eset GSE9891_eset"
+R --no-save --args $DATASETS_ESTIMATE < 6.Immune_Infiltrate/Scripts/A.ESTIMATE.R
 
 # ~~~~~~~~~~~~~
 # ssGSEA
 # ~~~~~~~~~~~~~
 # Perform ssGSEA analysis to observe gene set enrichment of 22 leukocyte
 # signatures (LM22)
-R --no-save --args $DATASETS < 6.Immune_Infiltrate/Scripts/B.ssGSEA.R
+#R --no-save --args $DATASETS < 6.Immune_Infiltrate/Scripts/B.ssGSEA.R
 
 # ~~~~~~~~~~~~~
 # MCPcounter

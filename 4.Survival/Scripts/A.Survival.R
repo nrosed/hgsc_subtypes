@@ -8,7 +8,7 @@
 
 args <- commandArgs(trailingOnly=TRUE)
 
-# args <- c("TCGA_eset", "Mayo", "GSE32062.GPL6480_eset", "GSE9891_eset")
+# args <- c("TCGA_eset", "Mayo", "GSE32062.GPL6480_eset", "GSE9891_eset", "aaces.eset")
 ############################################
 # Load Libraries
 ############################################
@@ -53,7 +53,7 @@ for (phenoset in 1:length(args)) {
     if (args[phenoset] == "Mayo") {
       dta <- pData(get(load("1.DataInclusion/Data/Mayo/MayoEset.Rda")))
       Mayogood <- read.csv(file = file.path("1.DataInclusion", "Data", "GoodSamples", 
-                                            "Mayo_samplesRemoved.csv"))
+                                            "mayo.eset_samplesRemoved.csv"))
       Mayoaccept <- c(paste(Mayogood$x))
       rownames(dta) <- dta[ ,1]
       phenoData[[phenoset]] <- dta[Mayoaccept, ]
@@ -73,7 +73,7 @@ datasetMembers <- list.files(path = "2.Clustering_DiffExprs/Tables/ClusterMember
 datasetMembers_NMF <- list.files(path = "2.Clustering_DiffExprs/Tables/ClusterMembership/nmf/") 
 for (dataset in 1:length(args)) {
   holder <- args[dataset]
-  ClusMember <- datasetMembers[grep(holder, datasetMembers)]
+  ClusMember <- datasetMembers[grep(holder, datasetMembers, ignore.case=T)]
   
   ClusData <- read.csv(paste("2.Clustering_DiffExprs/Tables/ClusterMembership/kmeans/", 
                              ClusMember, sep = ""), row.names = 1)
@@ -82,7 +82,7 @@ for (dataset in 1:length(args)) {
   names(ClusterMembershipList)[dataset] <- args[dataset]
   
   # NMF cluster membership
-  ClusMember <- datasetMembers_NMF[grep(holder, datasetMembers_NMF)]
+  ClusMember <- datasetMembers_NMF[grep(holder, datasetMembers_NMF, ignore.case=T)]
   ClusMember <- ClusMember[grepl("mapped", ClusMember)]
   ClusData <- read.csv(paste("2.Clustering_DiffExprs/Tables/ClusterMembership/nmf/", 
                              ClusMember, sep = ""), row.names = 1)
@@ -90,6 +90,16 @@ for (dataset in 1:length(args)) {
   ClusterMembershipList_NMF[[dataset]] <- ClusData
   names(ClusterMembershipList_NMF)[dataset] <- args[dataset]
 }
+
+############################################
+# Make sure the data is the same in both pheno and cluster
+############################################
+data_intersect = intersect(names(phenoData), names(ClusterMembershipList))
+data_intersect = intersect(data_intersect, names(ClusterMembershipList_NMF))
+phenoData = phenoData[data_intersect]
+ClusterMembershipList = ClusterMembershipList[data_intersect]
+ClusterMembershipList_NMF = ClusterMembershipList_NMF[data_intersect]
+
 
 ############################################
 # Get data frames ready for CoxPh

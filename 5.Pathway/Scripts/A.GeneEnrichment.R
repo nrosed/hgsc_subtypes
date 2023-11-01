@@ -8,7 +8,7 @@
 # both positively and negatively regulated
 
 args <- commandArgs(trailingOnly=TRUE)
-#args <- c("TCGA_eset", "Mayo", "GSE32062.GPL6480_eset", "GSE9891_eset")
+# args <- c("TCGA_eset", "mayo.eset", "GSE32062.GPL6480_eset", "GSE9891_eset", "aaces.eset")
 
 sig_alpha <- 0.05 / 10930 # 0.05 / number of common genes
 
@@ -29,7 +29,7 @@ datasetMembers <- list.files(path = "2.Clustering_DiffExprs/Tables/SAM_results/"
 SAMList <- list()
 for (dataset in 1:length(args)) {
   holder <- args[dataset]
-  DMember <- datasetMembers[grep(holder, datasetMembers)]
+  DMember <- datasetMembers[grep(holder, datasetMembers, ignore.case=T)]
   tmpList <- list()
   
   for(cluster in 1:length(DMember)) {
@@ -145,7 +145,9 @@ for (centroid in 1:length(centroidOverlapingList)) {
     # Combine cluster specific pos and neg genes into single matrix
     for (regdir in 1:length(ClusterSpecific)) {
       exprsSpecific <- ClusterSpecific[[regdir]]
-      tmpMatrix[1:length(exprsSpecific), regdir] <- exprsSpecific
+      if(length(exprsSpecific) > 0){
+        tmpMatrix[1:length(exprsSpecific), regdir] <- exprsSpecific
+      }
     }
     data_matrix[, c(set_columns[[clus]])] <- tmpMatrix
   }

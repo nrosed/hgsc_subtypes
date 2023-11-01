@@ -83,7 +83,7 @@ for (dataset in 1:length(args)) {
       
       # Read in file and subset according to good samples
       dta <- pData(get(load("1.DataInclusion/Data/Mayo/MayoEset.Rda")))
-      Mayogood <- read.csv(file = file.path("1.DataInclusion", "Data", "GoodSamples", "Mayo_samplesRemoved.csv"))
+      Mayogood <- read.csv(file = file.path("1.DataInclusion", "Data", "GoodSamples", "mayo.eset_samplesRemoved.csv"))
       Mayoaccept <- c(paste(Mayogood$x))
       rownames(dta) <- dta[ ,1]
       phenoData[[dataset]] <- dta[Mayoaccept,]
@@ -113,7 +113,7 @@ ClusterMembershipList <- list()
 datasetMembers <- list.files(path = "2.Clustering_DiffExprs/Tables/ClusterMembership/kmeans/")
 for (dataset in 1:length(args)) {
   holder <- args[dataset]
-  ClusMember <- datasetMembers[grep(holder, datasetMembers)]
+  ClusMember <- datasetMembers[grep(holder, datasetMembers, ignore.case=T)]
   
   ClusData <- read.csv(paste("2.Clustering_DiffExprs/Tables/ClusterMembership/kmeans/", 
                              ClusMember, sep = ""), row.names = 1)

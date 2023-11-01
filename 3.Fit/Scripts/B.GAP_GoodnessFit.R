@@ -8,7 +8,7 @@
 # The script is computationally expensive so it would be useful to run on a cluster.
 
 args <- commandArgs(trailingOnly=TRUE)
-args <- c(8, 200, 20, 20, 123, "TCGA_eset", "Mayo", "GSE32062.GPL6480_eset", "GSE9891_eset")
+#args <- c(8, 200, 20, 20, 123, "TCGA_eset", "Mayo", "GSE32062.GPL6480_eset", "GSE9891_eset")
 ############################################
 # Load Libraries
 ############################################

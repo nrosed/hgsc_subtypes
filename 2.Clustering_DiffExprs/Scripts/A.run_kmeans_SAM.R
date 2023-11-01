@@ -11,11 +11,11 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 
-#args <- c(2, 4, 20, 123, FALSE, FALSE, "commongenes", "aaces.rnaseq.eset", "TCGA_eset", "mayo.eset",
-#          "GSE32062.GPL6480_eset", "GSE9891_eset", "GSE26712_eset",
-#           "aaces.eset")
+#args <- c(2, 4, 100, 123, FALSE, TRUE, "commongenes", "aaces.rnaseq.eset", "aaces.white.rnaseq.eset", "TCGA_eset", "mayo.eset",
+#         "GSE32062.GPL6480_eset", "GSE9891_eset",
+#          "aaces.eset")
 #args <- c(2, 4, 20, 123, FALSE, TRUE, "commongenes", "aaces.rnaseq.eset", "aaces.eset", "TCGA_eset", "GSE26712_eset")
-
+ 
 ############################################
 # Load Libraries
 ############################################
@@ -230,9 +230,11 @@ if (bNMF) {
                                      nmf_cluster_list = Clusters,
                                      Reference = "TCGA")
 } else {
-  NewClusters <- AssignReference("TCGA", Cluster = "ClusterK3",
+  NewClusters <- AssignReference("TCGA", Cluster = "ClusterK3", # try ClusterK4, was K3
                                  Cor = WithinDatasetCor,
                                  ClusterList = Clusters)
+  NewClusters$TCGA_eset = Clusters$TCGA_eset
+
 }
 
 # Run SAM again but with TCGA clusters assigned as a reference
@@ -597,14 +599,15 @@ for (centroid in 1:length(Dlist.mapped.cor)) {
 ############################################
 # Before plotting figures, remove Bonome dataset
 ############################################
-for (cor.list in 1:length(Dlist.mapped.cor)) {
-  for (centroid in 1:(ncol(Dlist.mapped.cor[[cor.list]]) - 1)) {
-    Dlist.mapped.cor[[cor.list]] <- Dlist.mapped.cor[[cor.list]][-grep(
-      "GSE26712_eset", paste(Dlist.mapped.cor[[cor.list]][, centroid])), ]
-  }
-}
+#for (cor.list in 1:length(Dlist.mapped.cor)) {
+#  for (centroid in 1:(ncol(Dlist.mapped.cor[[cor.list]]) - 1)) {
+#    Dlist.mapped.cor[[cor.list]] <- Dlist.mapped.cor[[cor.list]][-grep(
+#      "GSE26712_eset", paste(Dlist.mapped.cor[[cor.list]][, centroid])), ]
+#  }
+#}
 
-datasets <- argsCurated[-grep("GSE26712_eset", argsCurated)]
+#datasets <- argsCurated[-grep("GSE26712_eset", argsCurated)]
+datasets <- argsCurated
 
 ############################################
 # Plot Re-Assigned Heatmaps
